@@ -24,9 +24,9 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
 
       <!-- UP-LEFT: BRAND LOGO + CUSTOMER SUPPORT + SIGN IN / REGISTER -->
-      <div class="flex flex-wrap items-center gap-4">
+      <div class="flex flex-wrap items-center gap-3.5">
         <div class="flex items-center gap-3 cursor-pointer" onclick="switchPage('flights')">
-          <div class="w-10 h-10 rounded-xl bg-gold flex items-center justify-center font-bold text-navy text-sm tracking-tighter shadow">SFR</div>
+          <div id="brandLogoMount" class="w-11 h-11 rounded-xl bg-white flex items-center justify-center p-1 shadow"></div>
           <div>
             <span class="font-bold text-xl tracking-wide">SAFAR</span>
             <span class="text-gold font-semibold text-lg ml-1">سفر</span>
@@ -42,7 +42,7 @@
         </button>
       </div>
 
-      <!-- CENTER/RIGHT NAVIGATION TABS -->
+      <!-- NAVIGATION TABS -->
       <nav class="flex items-center gap-1.5 overflow-x-auto text-xs md:text-sm py-1">
         <button onclick="switchPage('flights')" id="tab-flights" class="tab-active px-3 py-1.5 rounded-lg transition whitespace-nowrap" data-i18n="nav_flights">Flights</button>
         <button onclick="switchPage('hotels')" id="tab-hotels" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 transition whitespace-nowrap" data-i18n="nav_hotels">Hotels</button>
@@ -66,11 +66,11 @@
 
         <select id="currencySelect" onchange="onCurrencyChange()" class="bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1.5 text-white font-semibold">
           <option value="USD">USD ($)</option>
+          <option value="GBP">GBP (£)</option>
           <option value="EUR">EUR (€)</option>
           <option value="AFN">AFN (؋)</option>
           <option value="PKR">PKR (₨)</option>
           <option value="INR">INR (₹)</option>
-          <option value="GBP">GBP (£)</option>
           <option value="AED">AED (د.إ)</option>
           <option value="SAR">SAR (﷼)</option>
           <option value="TRY">TRY (₺)</option>
@@ -83,8 +83,7 @@
   <div id="page-flights" class="page-section">
     <section class="bg-navy text-white pt-8 pb-16 px-4">
       <div class="max-w-6xl mx-auto">
-        <h1 class="text-2xl md:text-4xl font-bold mb-2" data-i18n="hero_title">Your Journey, Simplified.</h1>
-        <p class="text-slate-300 text-sm md:text-base mb-6" data-i18n="hero_sub">Book domestic Afghan &amp; international flights — pay via HesabPay, M-Paisa, or Bank Transfer.</p>
+        <h1 class="text-2xl md:text-4xl font-bold mb-6" data-i18n="hero_title">Your Journey, Simplified.</h1>
 
         <!-- SEARCH CARD -->
         <div class="bg-white text-slate-800 rounded-2xl shadow-xl p-5 md:p-6">
@@ -97,6 +96,11 @@
               <input type="radio" name="tripType" value="roundtrip" onchange="toggleReturnDate()" class="accent-[#0A2239]" />
               <span data-i18n="round_trip">Round-trip</span>
             </label>
+            <label class="flex items-center gap-1.5 cursor-pointer border-l border-slate-200 pl-4">
+              <input type="checkbox" id="directOnly" onchange="renderResults()" class="accent-[#0A2239] rounded" />
+              <span data-i18n="direct_only">Direct</span>
+            </label>
+
             <select id="cabinClass" class="ml-auto border rounded-lg px-3 py-1 text-slate-700">
               <option value="economy">Economy</option>
               <option value="premium">Premium Economy</option>
@@ -169,7 +173,7 @@
   <!-- ==================== PAGE 2: HOTELS ==================== -->
   <div id="page-hotels" class="page-section hidden max-w-6xl mx-auto px-4 py-10">
     <h2 class="text-2xl font-bold text-navy mb-2">Verified Partner Hotels</h2>
-    <p class="text-slate-500 text-sm mb-6">Pay locally upon arrival or reserve in advance via HesabPay / Bank Transfer.</p>
+    <p class="text-slate-500 text-sm mb-6">Flexible hotel stays across key transit and travel destinations.</p>
     <div id="hotelsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
   </div>
 
@@ -183,11 +187,11 @@
   <!-- ==================== PAGE 4: VISA & GUIDE ==================== -->
   <div id="page-visa" class="page-section hidden max-w-6xl mx-auto px-4 py-10">
     <h2 class="text-2xl font-bold text-navy mb-2">Visa &amp; Travel Requirements</h2>
-    <p class="text-slate-500 text-sm mb-6">Essential entry rules, baggage allowances, and transit checklists for Afghan &amp; international passport holders.</p>
+    <p class="text-slate-500 text-sm mb-6">Essential entry rules, baggage allowances, and transit checklists for travelers.</p>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-white p-6 rounded-2xl shadow-sm border">
         <h3 class="font-bold text-navy text-lg mb-2">UAE (Dubai / Sharjah)</h3>
-        <p class="text-sm text-slate-600">30-day &amp; 60-day tourist visas available through approved UAE sponsors. Passport must be valid for at least 6 months with confirmed return ticket.</p>
+        <p class="text-sm text-slate-600">30-day &amp; 60-day tourist visas available through approved sponsors. Passport must be valid for at least 6 months with confirmed return ticket.</p>
       </div>
       <div class="bg-white p-6 rounded-2xl shadow-sm border">
         <h3 class="font-bold text-navy text-lg mb-2">Turkey (Istanbul)</h3>
@@ -195,7 +199,7 @@
       </div>
       <div class="bg-white p-6 rounded-2xl shadow-sm border">
         <h3 class="font-bold text-navy text-lg mb-2">Saudi Arabia (Umrah &amp; Transit)</h3>
-        <p class="text-sm text-slate-600">Umrah visas issued via Nusuk-authorized operators. Free 96-hour Stopover Visa available when flying Saudia or Flynas.</p>
+        <p class="text-sm text-slate-600">Umrah visas issued via Nusuk-authorized operators. Stopover visa options available on eligible carriers.</p>
       </div>
       <div class="bg-white p-6 rounded-2xl shadow-sm border">
         <h3 class="font-bold text-navy text-lg mb-2">Domestic Flights (Kam Air &amp; Ariana)</h3>
@@ -228,15 +232,15 @@
   <div id="page-support" class="page-section hidden max-w-4xl mx-auto px-4 py-10">
     <div class="bg-white rounded-2xl p-6 shadow-sm border space-y-4">
       <h2 class="text-2xl font-bold text-navy">24/7 Multilingual Customer Support</h2>
-      <p class="text-sm text-slate-600">Need help with date changes, baggage, or HesabPay / bank transfers? Reach our support desk in Pashto, Dari, or English.</p>
+      <p class="text-sm text-slate-600">Need help with date changes, baggage, or ticket confirmation? Reach our support desk in Pashto, Dari, or English.</p>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
         <div class="p-4 rounded-xl bg-slate-50 border">
           <div class="font-bold text-navy mb-1">Ticketing &amp; Support Desk</div>
           <p class="text-slate-600">Fast ticket confirmation, reissue, and passenger assistance.</p>
         </div>
         <div class="p-4 rounded-xl bg-slate-50 border">
-          <div class="font-bold text-navy mb-1">Local Payments</div>
-          <p class="text-slate-600">HesabPay (<strong>SAFAR-AF</strong>), M-Paisa, AIB &amp; Azizi Bank.</p>
+          <div class="font-bold text-navy mb-1">Payment Verification</div>
+          <p class="text-slate-600">Upload transfer receipts during booking or check status under My Bookings.</p>
         </div>
         <div class="p-4 rounded-xl bg-slate-50 border">
           <div class="font-bold text-navy mb-1">Official Channels</div>
@@ -360,7 +364,23 @@
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // =========================================================
-    // 2. REAL AIRPORTS DIRECTORY (INCLUDING IST & ALL HUBS)
+    // 2. BRAND LOGO RENDERER (MATCHING UPLOADED SAFAR LOGO)
+    // =========================================================
+    function renderBrandLogo() {
+      const mount = document.getElementById("brandLogoMount");
+      if (!mount) return;
+      mount.innerHTML = `
+        <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg" aria-label="SAFAR Logo">
+          <path d="M18 58 C24 38, 52 33, 75 45 C58 55, 38 62, 18 58 Z" fill="#0A2239" />
+          <path d="M74 47 L42 98 L47 101 L79 50 Z" fill="#B08748" />
+          <path d="M82 51 C96 68, 92 92, 72 103 C63 108, 55 107, 50 105 L82 51 Z" fill="#B08748" />
+          <path d="M84 26 L91 23 L96 14 L99 15 L97 24 L105 26 L104 29 L96 29 L92 37 L89 36 L91 28 L83 28 Z" fill="#0A2239" />
+        </svg>
+      `;
+    }
+
+    // =========================================================
+    // 3. REAL AIRPORTS DIRECTORY (INCLUDING IST & ALL HUBS)
     // =========================================================
     const AIRPORTS = [
       { code: "KBL", name: "Hamid Karzai International Airport", city: "Kabul", country: "Afghanistan" },
@@ -444,7 +464,7 @@
     });
 
     // =========================================================
-    // 3. AUTHENTICATION (SIGN IN / REGISTER)
+    // 4. AUTHENTICATION (SIGN IN / REGISTER)
     // =========================================================
     let authMode = "login";
 
@@ -518,28 +538,28 @@
     }
 
     // =========================================================
-    // 4. CURRENCIES (9) & TRANSLATIONS (7 LANGUAGES + RTL)
+    // 5. CURRENCIES (9) & TRANSLATIONS (7 LANGUAGES + RTL)
     // =========================================================
     const CURRENCIES = {
       USD: { symbol: "$", rate: 1 },
+      GBP: { symbol: "£", rate: 0.79 },
       EUR: { symbol: "€", rate: 0.92 },
       AFN: { symbol: "؋", rate: 71 },
       PKR: { symbol: "₨", rate: 278 },
       INR: { symbol: "₹", rate: 84 },
-      GBP: { symbol: "£", rate: 0.79 },
       AED: { symbol: "AED ", rate: 3.67 },
       SAR: { symbol: "SAR ", rate: 3.75 },
       TRY: { symbol: "₺", rate: 34.5 },
     };
 
     const I18N = {
-      en: { dir: "ltr", nav_flights: "Flights", nav_hotels: "Hotels", nav_transfers: "Transfers", nav_visa: "Visa & Guide", nav_deals: "Deals", nav_bookings: "My Bookings", hero_title: "Your Journey, Simplified.", hero_sub: "Book domestic Afghan & international flights — pay via HesabPay, M-Paisa, or Bank Transfer.", one_way: "One-way", round_trip: "Round-trip", from_label: "From Airport", to_label: "To Airport", dep_label: "Departure (Live Prices)", ret_label: "Return (Live Prices)", search_btn: "Search Flights", popular_routes: "Popular Routes from Afghanistan & Diaspora Hubs" },
-      ps: { dir: "rtl", nav_flights: "پروازونه", nav_hotels: "هوټلونه", nav_transfers: "ټرانسفر", nav_visa: "ویزه او لارښود", nav_deals: "تخفیفونه", nav_bookings: "زما ټکټونه", hero_title: "ستاسو سفر، په اسانۍ سره.", hero_sub: "کورني او نړیوال پروازونه بک کړئ — تادیه د حساب‌پې، ام‌پېسا یا بانک له لارې.", one_way: "یو طرفه", round_trip: "تګ او راتګ", from_label: "له کوم هوايي ډګر", to_label: "کوم هوايي ډګر ته", dep_label: "د تګ نیټه (ژوندۍ بیې)", ret_label: "د راتګ نیټه", search_btn: "پرواز ولټوئ", popular_routes: "مشهورې لارې" },
-      fa: { dir: "rtl", nav_flights: "پروازها", nav_hotels: "هوتل‌ها", nav_transfers: "ترانسفر", nav_visa: "ویزا و راهنما", nav_deals: "تخفیف‌ها", nav_bookings: "رزروهای من", hero_title: "سفر شما، ساده و مطمئن.", hero_sub: "رزرو پروازهای داخلی و خارجی — پرداخت آسان با حساب‌پی، ام‌پیسا و انتقال بانکی.", one_way: "یک‌طرفه", round_trip: "رفت و برگشت", from_label: "از فرودگاه", to_label: "به فرودگاه", dep_label: "تاریخ رفت (قیمت زنده)", ret_label: "تاریخ برگشت", search_btn: "جستجوی پرواز", popular_routes: "مسیرهای پرطرفدار" },
-      ar: { dir: "rtl", nav_flights: "رحلات", nav_hotels: "فنادق", nav_transfers: "توصيل", nav_visa: "التأشيرات", nav_deals: "عروض", nav_bookings: "حجوزاتي", hero_title: "رحلتك، بكل بساطة.", hero_sub: "احجز رحلات الطيران المحلية والدولية بسهولة وأمان.", one_way: "ذهاب فقط", round_trip: "ذهاب وعودة", from_label: "مطار المغادرة", to_label: "مطار الوصول", dep_label: "المغادرة (أسعار مباشرة)", ret_label: "العودة", search_btn: "بحث عن رحلات", popular_routes: "الوجهات الأكثر طلباً" },
-      tr: { dir: "ltr", nav_flights: "Uçuşlar", nav_hotels: "Oteller", nav_transfers: "Transfer", nav_visa: "Vize Rehberi", nav_deals: "Fırsatlar", nav_bookings: "Rezervasyonlarım", hero_title: "Yolculuğunuz Basitleştirildi.", hero_sub: "Afganistan iç hat ve uluslararası uçuşları saniyeler içinde rezerve edin.", one_way: "Tek Yön", round_trip: "Gidiş-Dönüş", from_label: "Kalkış Havalimanı", to_label: "Varış Havalimanı", dep_label: "Gidiş (Canlı Fiyatlar)", ret_label: "Dönüş", search_btn: "Uçuş Ara", popular_routes: "Popüler Rotalar" },
-      nl: { dir: "ltr", nav_flights: "Vluchten", nav_hotels: "Hotels", nav_transfers: "Transfers", nav_visa: "Visum & Gids", nav_deals: "Aanbiedingen", nav_bookings: "Mijn Boekingen", hero_title: "Jouw Reis, Vereenvoudigd.", hero_sub: "Boek binnenlandse en internationale vluchten in enkele seconden.", one_way: "Enkele reis", round_trip: "Retour", from_label: "Vertrekluchthaven", to_label: "Aankomstluchthaven", dep_label: "Vertrek (Live Prijzen)", ret_label: "Terugkomst", search_btn: "Zoek Vluchten", popular_routes: "Populaire Routes" },
-      es: { dir: "ltr", nav_flights: "Vuelos", nav_hotels: "Hoteles", nav_transfers: "Traslados", nav_visa: "Visa y Guía", nav_deals: "Ofertas", nav_bookings: "Mis Reservas", hero_title: "Tu Viaje, Simplificado.", hero_sub: "Reserva vuelos nacionales e internacionales en segundos.", one_way: "Solo ida", round_trip: "Ida y vuelta", from_label: "Aeropuerto de Origen", to_label: "Aeropuerto de Destino", dep_label: "Salida (Precios en vivo)", ret_label: "Regreso", search_btn: "Buscar Vuelos", popular_routes: "Rutas Populares" }
+      en: { dir: "ltr", nav_flights: "Flights", nav_hotels: "Hotels", nav_transfers: "Transfers", nav_visa: "Visa & Guide", nav_deals: "Deals", nav_bookings: "My Bookings", hero_title: "Your Journey, Simplified.", one_way: "One-way", round_trip: "Round-trip", direct_only: "Direct", from_label: "From Airport", to_label: "To Airport", dep_label: "Departure (Live Prices)", ret_label: "Return (Live Prices)", search_btn: "Search Flights", popular_routes: "Popular Routes from Afghanistan & Diaspora Hubs" },
+      ps: { dir: "rtl", nav_flights: "پروازونه", nav_hotels: "هوټلونه", nav_transfers: "ټرانسفر", nav_visa: "ویزه او لارښود", nav_deals: "تخفیفونه", nav_bookings: "زما ټکټونه", hero_title: "ستاسو سفر، په اسانۍ سره.", one_way: "یو طرفه", round_trip: "تګ او راتګ", direct_only: "مستقیم", from_label: "له کوم هوايي ډګر", to_label: "کوم هوايي ډګر ته", dep_label: "د تګ نیټه (ژوندۍ بیې)", ret_label: "د راتګ نیټه", search_btn: "پرواز ولټوئ", popular_routes: "مشهورې لارې" },
+      fa: { dir: "rtl", nav_flights: "پروازها", nav_hotels: "هوتل‌ها", nav_transfers: "ترانسفر", nav_visa: "ویزا و راهنما", nav_deals: "تخفیف‌ها", nav_bookings: "رزروهای من", hero_title: "سفر شما، ساده و مطمئن.", one_way: "یک‌طرفه", round_trip: "رفت و برگشت", direct_only: "مستقیم", from_label: "از فرودگاه", to_label: "به فرودگاه", dep_label: "تاریخ رفت (قیمت زنده)", ret_label: "تاریخ برگشت", search_btn: "جستجوی پرواز", popular_routes: "مسیرهای پرطرفدار" },
+      ar: { dir: "rtl", nav_flights: "رحلات", nav_hotels: "فنادق", nav_transfers: "توصيل", nav_visa: "التأشيرات", nav_deals: "عروض", nav_bookings: "حجوزاتي", hero_title: "رحلتك، بكل بساطة.", one_way: "ذهاب فقط", round_trip: "ذهاب وعودة", direct_only: "مباشر", from_label: "مطار المغادرة", to_label: "مطار الوصول", dep_label: "المغادرة (أسعار مباشرة)", ret_label: "العودة", search_btn: "بحث عن رحلات", popular_routes: "الوجهات الأكثر طلباً" },
+      tr: { dir: "ltr", nav_flights: "Uçuşlar", nav_hotels: "Oteller", nav_transfers: "Transfer", nav_visa: "Vize Rehberi", nav_deals: "Fırsatlar", nav_bookings: "Rezervasyonlarım", hero_title: "Yolculuğunuz Basitleştirildi.", one_way: "Tek Yön", round_trip: "Gidiş-Dönüş", direct_only: "Direkt", from_label: "Kalkış Havalimanı", to_label: "Varış Havalimanı", dep_label: "Gidiş (Canlı Fiyatlar)", ret_label: "Dönüş", search_btn: "Uçuş Ara", popular_routes: "Popüler Rotalar" },
+      nl: { dir: "ltr", nav_flights: "Vluchten", nav_hotels: "Hotels", nav_transfers: "Transfers", nav_visa: "Visum & Gids", nav_deals: "Aanbiedingen", nav_bookings: "Mijn Boekingen", hero_title: "Jouw Reis, Vereenvoudigd.", one_way: "Enkele reis", round_trip: "Retour", direct_only: "Direct", from_label: "Vertrekluchthaven", to_label: "Aankomstluchthaven", dep_label: "Vertrek (Live Prijzen)", ret_label: "Terugkomst", search_btn: "Zoek Vluchten", popular_routes: "Populaire Routes" },
+      es: { dir: "ltr", nav_flights: "Vuelos", nav_hotels: "Hoteles", nav_transfers: "Traslados", nav_visa: "Visa y Guía", nav_deals: "Ofertas", nav_bookings: "Mis Reservas", hero_title: "Tu Viaje, Simplificado.", one_way: "Solo ida", round_trip: "Ida y vuelta", direct_only: "Directo", from_label: "Aeropuerto de Origen", to_label: "Aeropuerto de Destino", dep_label: "Salida (Precios en vivo)", ret_label: "Regreso", search_btn: "Buscar Vuelos", popular_routes: "Rutas Populares" }
     };
 
     function formatPrice(usdAmount) {
@@ -570,7 +590,7 @@
     }
 
     // =========================================================
-    // 5. PAGE SWITCHER
+    // 6. PAGE SWITCHER
     // =========================================================
     function switchPage(page) {
       document.querySelectorAll(".page-section").forEach((sec) => sec.classList.add("hidden"));
@@ -581,7 +601,7 @@
     }
 
     // =========================================================
-    // 6. INTERACTIVE LIVE-PRICE CALENDAR POPUP
+    // 7. INTERACTIVE LIVE-PRICE CALENDAR POPUP
     // =========================================================
     let calTarget = "departure";
     let calViewYear = new Date().getFullYear();
@@ -726,7 +746,7 @@
     }
 
     // =========================================================
-    // 7. HYBRID FLIGHT SEARCH (FIXED FETCH + RESILIENT FALLBACK)
+    // 8. HYBRID FLIGHT SEARCH (FIXED FETCH + RESILIENT FALLBACK)
     // =========================================================
     let currentOffers = [];
     let selectedFlight = null;
@@ -757,14 +777,14 @@
 
       if (isDomestic) {
         return [
-          { id: "fb-rq-1", airline: "Kam Air", code: "RQ-901", origin, destination, depTime: "08:30", arrTime: "09:45", durationText: "1h 15m", stopLabel: "Non-Stop", groupTotalUsd: Math.round(dayUsd * mult), source: "domestic" },
-          { id: "fb-fg-2", airline: "Ariana Afghan Airlines", code: "FG-311", origin, destination, depTime: "13:15", arrTime: "14:30", durationText: "1h 15m", stopLabel: "Non-Stop", groupTotalUsd: Math.round((dayUsd + 8) * mult), source: "domestic" }
+          { id: "fb-rq-1", airline: "Kam Air", code: "RQ-901", origin, destination, depTime: "08:30", arrTime: "09:45", durationText: "1h 15m", stops: 0, stopLabel: "Non-Stop", groupTotalUsd: Math.round(dayUsd * mult), source: "domestic" },
+          { id: "fb-fg-2", airline: "Ariana Afghan Airlines", code: "FG-311", origin, destination, depTime: "13:15", arrTime: "14:30", durationText: "1h 15m", stops: 0, stopLabel: "Non-Stop", groupTotalUsd: Math.round((dayUsd + 8) * mult), source: "domestic" }
         ];
       }
       return [
-        { id: "fb-tk-1", airline: "Turkish Airlines", code: "TK-707", origin, destination, depTime: "06:15", arrTime: "11:50", durationText: "5h 35m", stopLabel: "Non-Stop", groupTotalUsd: Math.round(dayUsd * mult), source: "partner_live" },
-        { id: "fb-fz-2", airline: "flydubai", code: "FZ-302", origin, destination, depTime: "09:40", arrTime: "12:25", durationText: "3h 15m", stopLabel: "Non-Stop", groupTotalUsd: Math.round((dayUsd + 32) * mult), source: "partner_live" },
-        { id: "fb-ek-3", airline: "Emirates", code: "EK-641", origin, destination, depTime: "15:20", arrTime: "18:10", durationText: "3h 20m", stopLabel: "Non-Stop", groupTotalUsd: Math.round((dayUsd + 64) * mult), source: "partner_live" }
+        { id: "fb-tk-1", airline: "Turkish Airlines", code: "TK-707", origin, destination, depTime: "06:15", arrTime: "11:50", durationText: "5h 35m", stops: 0, stopLabel: "Non-Stop", groupTotalUsd: Math.round(dayUsd * mult), source: "partner_live" },
+        { id: "fb-fz-2", airline: "flydubai", code: "FZ-302", origin, destination, depTime: "09:40", arrTime: "12:25", durationText: "5h 10m", stops: 1, stopLabel: "1 Stop", groupTotalUsd: Math.round((dayUsd - 18) * mult), source: "partner_live" },
+        { id: "fb-ek-3", airline: "Emirates", code: "EK-641", origin, destination, depTime: "15:20", arrTime: "18:10", durationText: "5h 20m", stops: 0, stopLabel: "Non-Stop", groupTotalUsd: Math.round((dayUsd + 54) * mult), source: "partner_live" }
       ];
     }
 
@@ -812,6 +832,7 @@
               depTime: f.departure_time,
               arrTime: f.arrival_time,
               durationText: "1h 15m",
+              stops: 0,
               stopLabel: "Non-Stop",
               groupTotalUsd: Number(f.price_usd) * adults,
               source: "domestic",
@@ -857,9 +878,21 @@
 
     function renderResults() {
       const list = document.getElementById("resultsList");
+      const directOnly = document.getElementById("directOnly")?.checked;
       list.innerHTML = "";
 
-      currentOffers.forEach((flight, idx) => {
+      const visibleOffers = currentOffers.filter((flight) => {
+        if (!directOnly) return true;
+        return Number(flight.stops ?? 0) === 0;
+      });
+
+      if (visibleOffers.length === 0 && currentOffers.length > 0) {
+        list.innerHTML = `<div class="bg-white rounded-2xl p-5 shadow-sm border text-sm text-slate-500 text-center">No direct flights match this filter. Uncheck Direct to view connecting flights.</div>`;
+        return;
+      }
+
+      visibleOffers.forEach((flight) => {
+        const realIdx = currentOffers.indexOf(flight);
         const badge = flight.source === "domestic"
           ? `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded">Local Partner</span>`
           : `<span class="bg-sky-100 text-sky-800 text-xs font-semibold px-2 py-0.5 rounded">Instant Ticket</span>`;
@@ -890,7 +923,7 @@
             </div>
             <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0">
               <div class="text-xl font-extrabold text-navy">${formatPrice(flight.groupTotalUsd)}</div>
-              <button type="button" onclick="openBookingModal(${idx})" class="bg-navy text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-slate-800 mt-1">
+              <button type="button" onclick="openBookingModal(${realIdx})" class="bg-navy text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-slate-800 mt-1">
                 Select Flight
               </button>
             </div>
@@ -900,7 +933,7 @@
     }
 
     // =========================================================
-    // 8. POPULATE SECTIONS (ROUTES, HOTELS, DEALS, CARS)
+    // 9. POPULATE SECTIONS (ROUTES, HOTELS, DEALS, CARS)
     // =========================================================
     function quickSearchRoute(from, to) {
       document.getElementById("origin").value = from;
@@ -973,7 +1006,7 @@
     }
 
     // =========================================================
-    // 9. BOOKING, GROQ AI PASSPORT PARSER & LOOKUP
+    // 10. BOOKING, GROQ AI PASSPORT PARSER & LOOKUP
     // =========================================================
     function openBookingModal(index) {
       selectedFlight = currentOffers[index];
@@ -1091,6 +1124,7 @@
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
+      renderBrandLogo();
       const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0];
       document.getElementById("departureDate").value = nextWeek;
       syncAirportSublabels();
