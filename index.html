@@ -44,11 +44,11 @@
   <section class="bg-navy text-white pt-8 pb-16 px-4">
     <div class="max-w-5xl mx-auto">
       <h1 class="text-2xl md:text-4xl font-bold mb-2">Your Journey, Simplified.</h1>
-      <p class="text-slate-300 text-sm md:text-base mb-6">Book domestic Afghan & international flights — pay via HesabPay, M-Paisa, or Bank Transfer.</p>
+      <p class="text-slate-300 text-sm md:text-base mb-6">Book domestic Afghan &amp; international flights — pay via HesabPay, M-Paisa, or Bank Transfer.</p>
 
       <!-- SEARCH CARD -->
       <div class="bg-white text-slate-800 rounded-2xl shadow-xl p-5 md:p-6">
-        <div class="flex flex-wrap gap-4 mb-4 text-sm font-medium">
+        <div class="flex flex-wrap items-center gap-4 mb-4 text-sm font-medium">
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="tripType" value="oneway" checked onchange="toggleReturnDate()" class="accent-[#0A2239]" /> One-way
           </label>
@@ -57,12 +57,15 @@
           </label>
           <select id="cabinClass" class="ml-auto border rounded-lg px-3 py-1 text-slate-700">
             <option value="economy">Economy</option>
+            <option value="premium">Premium Economy</option>
             <option value="business">Business</option>
+            <option value="first">First</option>
           </select>
           <select id="adults" class="border rounded-lg px-3 py-1 text-slate-700">
             <option value="1">1 Adult</option>
             <option value="2">2 Adults</option>
             <option value="3">3 Adults</option>
+            <option value="4">4 Adults</option>
           </select>
         </div>
 
@@ -111,7 +114,7 @@
     <div id="resultsList" class="space-y-4"></div>
   </main>
 
-  <!-- BOOKING & AI PASSPORT/RECEIPT MODAL -->
+  <!-- BOOKING & AI PASSPORT MODAL -->
   <div id="bookingModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative my-8">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
@@ -123,7 +126,7 @@
         <label class="block text-xs font-bold text-navy mb-1">⚡ AI Passport Auto-Fill (Paste Passport MRZ Line)</label>
         <div class="flex gap-2">
           <input id="mrzInput" type="text" placeholder="P<AFGAHMADI<<ZAHRA<<<<..." class="flex-1 text-xs border rounded-lg px-2.5 py-1.5" />
-          <button onclick="autoFillPassport()" id="mrzBtn" class="bg-navy text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Auto-Fill</button>
+          <button type="button" onclick="autoFillPassport()" id="mrzBtn" class="bg-navy text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Auto-Fill</button>
         </div>
       </div>
 
@@ -151,11 +154,12 @@
 
         <div>
           <label class="block text-xs font-semibold mb-1">Payment Method</label>
-          <select id="paymentMethod" class="w-full border rounded-lg px-3 py-2 font-medium">
+          <select id="paymentMethod" onchange="updatePaymentNote()" class="w-full border rounded-lg px-3 py-2 font-medium">
             <option value="hesabpay">HesabPay (Merchant ID: SAFAR-AF)</option>
             <option value="mpaisa">M-Paisa / Roshan Transfer</option>
             <option value="bank_transfer">Bank Transfer (AIB / Azizi Bank)</option>
           </select>
+          <p id="paymentNote" class="text-xs text-slate-500 mt-1">Pay via HesabPay app using Merchant ID <strong>SAFAR-AF</strong> and share your receipt.</p>
         </div>
 
         <div>
@@ -164,18 +168,28 @@
         </div>
 
         <button type="submit" id="confirmBookingBtn" class="w-full bg-gold text-navy font-bold py-3 rounded-xl shadow hover:opacity-95 mt-2">
-          Confirm & Reserve Ticket
+          Confirm &amp; Reserve Ticket
         </button>
       </form>
     </div>
   </div>
 
+  <!-- MY BOOKINGS MODAL -->
+  <div id="bookingsModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative my-8">
+      <button onclick="closeBookingsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+      <h2 class="text-xl font-bold text-navy mb-2">Lookup Your Booking</h2>
+      <div class="flex gap-2 mb-4">
+        <input id="lookupRef" type="text" placeholder="Enter Booking Ref (e.g. SFR-AB12CD)" class="flex-1 border rounded-xl px-3 py-2 text-sm uppercase" />
+        <button type="button" onclick="lookupBooking()" id="lookupBtn" class="bg-navy text-white text-sm font-semibold px-4 py-2 rounded-xl">Find</button>
+      </div>
+      <div id="lookupResult" class="text-sm text-slate-600"></div>
+    </div>
+  </div>
+
   <script>
-    // =========================================================
-    // 1. SUPABASE CONFIGURATION (PASTE YOUR ANON/PUBLISHABLE KEY)
-    // =========================================================
     const SUPABASE_URL = "https://vbqandmzjpvifvmuzibh.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_PE-K8FR8Bt8WlBMG3zdKbQ__mB8H9la";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
     const SAFAR_API_URL = `${SUPABASE_URL}/functions/v1/safar-api`;
 
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -183,15 +197,32 @@
     let currentOffers = [];
     let selectedFlight = null;
 
-    // Set default departure date to 7 days from today
+    const today = new Date().toISOString().split("T")[0];
     const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0];
+    document.getElementById("departureDate").min = today;
     document.getElementById("departureDate").value = nextWeek;
+    document.getElementById("returnDate").min = nextWeek;
 
     function toggleReturnDate() {
       const isRound = document.querySelector('input[name="tripType"]:checked').value === "roundtrip";
       const wrap = document.getElementById("returnDateWrap");
       wrap.classList.toggle("opacity-40", !isRound);
       wrap.classList.toggle("pointer-events-none", !isRound);
+      if (isRound && !document.getElementById("returnDate").value) {
+        document.getElementById("returnDate").value = new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0];
+      }
+    }
+
+    function updatePaymentNote() {
+      const method = document.getElementById("paymentMethod").value;
+      const note = document.getElementById("paymentNote");
+      if (method === "hesabpay") {
+        note.innerHTML = "Pay via HesabPay app using Merchant ID <strong>SAFAR-AF</strong> and attach/share your receipt.";
+      } else if (method === "mpaisa") {
+        note.innerHTML = "Send transfer via <strong>M-Paisa</strong> and include your booking reference in the note.";
+      } else {
+        note.innerHTML = "Transfer to <strong>AIB / Azizi Bank</strong> SAFAR account and upload your transfer slip.";
+      }
     }
 
     function showStatus(msg) {
@@ -200,9 +231,6 @@
       el.classList.remove("hidden");
     }
 
-    // =========================================================
-    // 2. HYBRID FLIGHT SEARCH (SUPABASE DOMESTIC + DUFFEL LIVE)
-    // =========================================================
     async function searchFlights() {
       const origin = document.getElementById("origin").value.trim().toUpperCase();
       const destination = document.getElementById("destination").value.trim().toUpperCase();
@@ -213,7 +241,10 @@
       const adults = parseInt(document.getElementById("adults").value, 10);
 
       if (!origin || !destination || !departureDate) {
-        return alert("Please enter origin, destination, and departure date.");
+        return showStatus("Please enter origin, destination, and departure date.");
+      }
+      if (tripType === "roundtrip" && returnDate && returnDate < departureDate) {
+        return showStatus("Return date cannot be earlier than departure date.");
       }
 
       const btn = document.getElementById("searchBtn");
@@ -223,19 +254,20 @@
       currentOffers = [];
 
       try {
-        // A. Query Domestic/Local Scheduled Flights in Supabase
-        const { data: localFlights } = await db
+        const { data: localFlights, error: dbErr } = await db
           .from("scheduled_flights")
           .select("*")
           .eq("origin_code", origin)
           .eq("destination_code", destination);
 
-        if (localFlights && localFlights.length > 0) {
+        if (!dbErr && localFlights && localFlights.length > 0) {
           localFlights.forEach((f) => {
             currentOffers.push({
               id: f.id,
               airline: f.airline,
               code: f.flight_number,
+              origin,
+              destination,
               depTime: f.departure_time,
               arrTime: f.arrival_time,
               durationText: "1h 15m",
@@ -247,7 +279,6 @@
           });
         }
 
-        // B. Query Live International Flights via safar-api Edge Function (Duffel)
         const apiRes = await fetch(SAFAR_API_URL, {
           method: "POST",
           headers: {
@@ -261,17 +292,21 @@
         });
 
         const apiData = await apiRes.json();
-        if (apiData.offers && apiData.offers.length > 0) {
+        if (apiData.offers && Array.isArray(apiData.offers)) {
           apiData.offers.forEach((o) => {
             currentOffers.push({
               ...o,
+              origin,
+              destination,
               groupTotalAfn: Math.round(o.groupTotalUsd * AFN_RATE),
             });
           });
         }
 
         if (currentOffers.length === 0) {
-          showStatus(`No flights found for ${origin} → ${destination} on ${departureDate}. Try KBL → DXB or KBL → HEA.`);
+          showStatus(apiData.error
+            ? `Search issue: ${apiData.error}. Try KBL → HEA or KBL → DXB.`
+            : `No flights found for ${origin} → ${destination} on ${departureDate}. Try KBL → DXB or KBL → HEA.`);
         } else {
           document.getElementById("statusBanner").classList.add("hidden");
         }
@@ -291,12 +326,21 @@
 
       currentOffers.forEach((flight, idx) => {
         const priceDisplay = currency === "AFN"
-          ? `${flight.groupTotalAfn.toLocaleString()} AFN`
+          ? `${Number(flight.groupTotalAfn).toLocaleString()} AFN`
           : `$${flight.groupTotalUsd} USD`;
 
         const badge = flight.source === "domestic"
           ? `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded">Local Partner</span>`
           : `<span class="bg-sky-100 text-sky-800 text-xs font-semibold px-2 py-0.5 rounded">Instant Global</span>`;
+
+        const returnRow = flight.retDepTime
+          ? `<div class="flex items-center gap-4 text-xs text-slate-500 mt-1.5 pl-2 border-l-2 border-gold">
+               <span>Return:</span>
+               <span><strong>${flight.retDepTime}</strong> ${flight.destination}</span>
+               <span>── ${flight.retDurationText || ""} ──</span>
+               <span><strong>${flight.retArrTime || ""}</strong> ${flight.origin}</span>
+             </div>`
+          : "";
 
         list.innerHTML += `
           <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -307,14 +351,15 @@
                 ${badge}
               </div>
               <div class="flex items-center gap-4 text-sm text-slate-700 mt-2">
-                <div><span class="font-bold text-base">${flight.depTime}</span> <span class="text-slate-500">${document.getElementById("origin").value.toUpperCase()}</span></div>
+                <div><span class="font-bold text-base">${flight.depTime}</span> <span class="text-slate-500">${flight.origin}</span></div>
                 <div class="text-xs text-slate-400">── ${flight.durationText} (${flight.stopLabel}) ──</div>
-                <div><span class="font-bold text-base">${flight.arrTime}</span> <span class="text-slate-500">${document.getElementById("destination").value.toUpperCase()}</span></div>
+                <div><span class="font-bold text-base">${flight.arrTime}</span> <span class="text-slate-500">${flight.destination}</span></div>
               </div>
+              ${returnRow}
             </div>
             <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0">
               <div class="text-xl font-extrabold text-navy">${priceDisplay}</div>
-              <button onclick="openBookingModal(${idx})" class="bg-navy text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-slate-800 mt-1">
+              <button type="button" onclick="openBookingModal(${idx})" class="bg-navy text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-slate-800 mt-1">
                 Select Flight
               </button>
             </div>
@@ -323,15 +368,15 @@
       });
     }
 
-    // =========================================================
-    // 3. GROQ AI PASSPORT AUTO-FILL & BOOKING SUBMISSION
-    // =========================================================
     function openBookingModal(index) {
       selectedFlight = currentOffers[index];
-      const origin = document.getElementById("origin").value.toUpperCase();
-      const dest = document.getElementById("destination").value.toUpperCase();
+      const currency = document.getElementById("currencySelect").value;
+      const priceText = currency === "AFN"
+        ? `${Number(selectedFlight.groupTotalAfn).toLocaleString()} AFN`
+        : `$${selectedFlight.groupTotalUsd} USD`;
+
       document.getElementById("modalFlightSummary").textContent =
-        `${selectedFlight.airline} (${selectedFlight.code}) • ${origin} → ${dest} • $${selectedFlight.groupTotalUsd} USD`;
+        `${selectedFlight.airline} (${selectedFlight.code}) • ${selectedFlight.origin} → ${selectedFlight.destination} • ${priceText}`;
       document.getElementById("bookingModal").classList.remove("hidden");
     }
 
@@ -358,7 +403,7 @@
           document.getElementById("paxPassport").value = data.result.passportNumber || "";
         }
       } catch (e) {
-        alert("Could not parse passport text.");
+        alert("Could not parse passport text: " + e.message);
       } finally {
         btn.textContent = "Auto-Fill";
       }
@@ -366,22 +411,27 @@
 
     async function submitBooking(e) {
       e.preventDefault();
+      if (!selectedFlight) return;
+
       const btn = document.getElementById("confirmBookingBtn");
       btn.disabled = true;
       btn.textContent = "Saving Booking...";
 
       const bookingRef = "SFR-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-      const origin = document.getElementById("origin").value.toUpperCase();
-      const dest = document.getElementById("destination").value.toUpperCase();
+      const currency = document.getElementById("currencySelect").value;
+      const totalAmount = currency === "AFN" ? selectedFlight.groupTotalAfn : selectedFlight.groupTotalUsd;
       let receiptPath = null;
 
-      // Upload receipt if attached
       const fileInput = document.getElementById("receiptFile");
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         const fileName = `${bookingRef}-${file.name}`;
-        const { data: uploadData } = await db.storage.from("receipts").upload(fileName, file);
-        if (uploadData) receiptPath = uploadData.path;
+        const { data: uploadData, error: upErr } = await db.storage.from("receipts").upload(fileName, file);
+        if (upErr) {
+          alert("Receipt upload note: " + upErr.message);
+        } else if (uploadData) {
+          receiptPath = uploadData.path;
+        }
       }
 
       const { error } = await db.from("bookings").insert([{
@@ -393,10 +443,10 @@
         flight_source: selectedFlight.source,
         airline: selectedFlight.airline,
         flight_number: selectedFlight.code,
-        route: `${origin}-${dest}`,
+        route: `${selectedFlight.origin}-${selectedFlight.destination}`,
         travel_date: document.getElementById("departureDate").value,
-        total_amount: selectedFlight.groupTotalUsd,
-        currency: "USD",
+        total_amount: totalAmount,
+        currency,
         payment_method: document.getElementById("paymentMethod").value,
         receipt_url: receiptPath,
       }]);
@@ -407,17 +457,48 @@
       if (error) {
         alert("Error saving booking: " + error.message);
       } else {
+        document.getElementById("bookingForm").reset();
         closeModal();
-        alert(`Booking Reserved! Reference: ${bookingRef}\nSend payment via ${document.getElementById("paymentMethod").value.toUpperCase()} and share ${bookingRef} on WhatsApp for instant ticketing.`);
+        alert(`Booking Reserved! Reference: ${bookingRef}\nComplete payment via ${document.getElementById("paymentMethod").value.toUpperCase()} and keep ${bookingRef} to check status under My Bookings.`);
       }
     }
 
     function openMyBookings() {
-      const ref = prompt("Enter your SAFAR Booking Reference (e.g. SFR-XXXXXX):");
-      if (ref) alert(`To check live ticket status for ${ref.toUpperCase()}, message SAFAR WhatsApp Support or check your email confirmation.`);
+      document.getElementById("lookupResult").innerHTML = "";
+      document.getElementById("bookingsModal").classList.remove("hidden");
     }
 
-    // Auto-load sample route on start
+    function closeBookingsModal() {
+      document.getElementById("bookingsModal").classList.add("hidden");
+    }
+
+    async function lookupBooking() {
+      const ref = document.getElementById("lookupRef").value.trim().toUpperCase();
+      const box = document.getElementById("lookupResult");
+      if (!ref) return;
+      box.textContent = "Checking...";
+
+      const { data, error } = await db
+        .from("bookings")
+        .select("booking_ref, passenger_name, airline, flight_number, route, travel_date, total_amount, currency, payment_status")
+        .eq("booking_ref", ref)
+        .maybeSingle();
+
+      if (error || !data) {
+        box.innerHTML = `<span class="text-red-600">No booking found for <strong>${ref}</strong>.</span>`;
+        return;
+      }
+
+      box.innerHTML = `
+        <div class="bg-slate-50 border rounded-xl p-3 space-y-1">
+          <div><strong>Ref:</strong> ${data.booking_ref} • <strong>Status:</strong> <span class="uppercase font-semibold text-navy">${data.payment_status}</span></div>
+          <div><strong>Passenger:</strong> ${data.passenger_name}</div>
+          <div><strong>Flight:</strong> ${data.airline} (${data.flight_number}) — ${data.route} on ${data.travel_date}</div>
+          <div><strong>Total:</strong> ${Number(data.total_amount).toLocaleString()} ${data.currency}</div>
+        </div>
+      `;
+    }
+
     window.addEventListener("DOMContentLoaded", searchFlights);
   </script>
 </body>
